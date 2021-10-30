@@ -20,42 +20,65 @@ namespace socialBrothersCase.Controllers
         public AdressController(AdressesContext adressesContext)
         {
             _adressesContext = adressesContext;
-
         }
 
         // GET: api/<AdressController>
+        /// <summary>
+        /// Retrieves all Adresses if Filters are untouched
+        /// FilterOperators are as follows:
+        /// 0: Equals                   5: Less then or equal
+        /// 1: Doesnt Equal             6: Contains
+        /// 2: Greater then             7: Starts with
+        /// 3: Greater then or equal    8: Ends with
+        /// 4: Less then
+        /// </summary>
+        /// <param name="OrderByProperty"></param>
+        /// <param name="filterByProperty"></param>
+        /// <param name="filterOperator"></param>
+        /// <param name="filterValue"></param>
+        /// <returns></returns>
         [HttpGet]
-        public IEnumerable<Adress> Get()
+        public IEnumerable<Adress> Get([FromQuery] string OrderByProperty = "Street", [FromQuery] string filterByProperty = "Street", [FromQuery] DynamicExpressions.FilterOperator filterOperator = DynamicExpressions.FilterOperator.Contains, [FromQuery] string filterValue = "")
         {
-            //TODO add filters/orderbys
-            return _adressesContext.Adresses.ToList();
+            var propertyGetter = DynamicExpressions.DynamicExpressions.GetPropertyGetter<Adress>(OrderByProperty);
+            var predicate = DynamicExpressions.DynamicExpressions.GetPredicate<Adress>(filterByProperty, filterOperator, filterValue);
+            return _adressesContext.Adresses.AsQueryable().Where(predicate).OrderBy(propertyGetter);
         }
 
         // GET api/<AdressController>/5
         [HttpGet("{id}")]
-        public Adress Get(Guid id)
+        public IActionResult Get(Guid id)
         {
             //TODO add catch if there is no adress with given ID
-            return _adressesContext.Adresses.Where(a => a.Id == id).First();
+            
+            if (_adressesContext.Adresses.Any(a => a.Id == id))
+            {
+                return Ok(_adressesContext.Adresses.First(a => a.Id == id));
+            }
+            else
+            {
+                return NotFound();
+            }
         }
 
         // POST api/<AdressController>
         [HttpPost]
-        public string Post([FromBody] Adress newAdress)
+        public IActionResult Post([FromBody] Adress newAdress)
         {
-            //TODO add validation
+            if (_adressesContext.Adresses.Any(a => a.Id == newAdress.Id))
+            {
+                return BadRequest();
+            }
+
             _adressesContext.Add(newAdress);
             _adressesContext.SaveChanges();
-            return "added new adress";
+            return Ok("added new adress");
         }
 
         // PUT api/<AdressController>/5
         [HttpPut]
         public void Put([FromBody] Adress newValues)
         {
-            /*Adress oldValues = _adressesContext.Adresses.Where(a => a.Id == id).First();
-            oldValues = newValues;*/
-
             _adressesContext.Update(newValues);
             _adressesContext.SaveChanges();
         }
