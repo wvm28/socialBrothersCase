@@ -27,6 +27,7 @@ namespace socialBrothersCase.Controllers
         [HttpGet]
         public IEnumerable<Adress> Get()
         {
+            //TODO add filters/orderbys
             return _adressesContext.Adresses.ToList();
         }
 
@@ -40,20 +41,23 @@ namespace socialBrothersCase.Controllers
 
         // POST api/<AdressController>
         [HttpPost]
-        public string Post([FromBody] Adress value)
+        public string Post([FromBody] Adress newAdress)
         {
-            return "test";
+            //TODO add validation
+            _adressesContext.Add(newAdress);
+            _adressesContext.SaveChanges();
+            return "added new adress";
         }
 
         // PUT api/<AdressController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        public void Put(Guid id, [FromBody] Adress value)
         {
         }
 
         // DELETE api/<AdressController>/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
+        public void Delete(Guid id)
         {
         }
     }
