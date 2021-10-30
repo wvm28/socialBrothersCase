@@ -79,6 +79,7 @@ namespace socialBrothersCase.Controllers
         [HttpPut]
         public void Put([FromBody] Adress newValues)
         {
+            //TODO add check thing idk anymore
             _adressesContext.Update(newValues);
             _adressesContext.SaveChanges();
         }
@@ -87,6 +88,7 @@ namespace socialBrothersCase.Controllers
         [HttpDelete("{id}")]
         public void Delete(Guid id)
         {
+            //TODO add check if adress exists
             Adress toBeDeleted = _adressesContext.Adresses.Where(a => a.Id == id).First();
             _adressesContext.Remove(toBeDeleted);
             _adressesContext.SaveChanges();
