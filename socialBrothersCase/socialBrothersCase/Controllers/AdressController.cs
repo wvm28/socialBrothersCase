@@ -50,15 +50,23 @@ namespace socialBrothersCase.Controllers
         }
 
         // PUT api/<AdressController>/5
-        [HttpPut("{id}")]
-        public void Put(Guid id, [FromBody] Adress value)
+        [HttpPut]
+        public void Put([FromBody] Adress newValues)
         {
+            /*Adress oldValues = _adressesContext.Adresses.Where(a => a.Id == id).First();
+            oldValues = newValues;*/
+
+            _adressesContext.Update(newValues);
+            _adressesContext.SaveChanges();
         }
 
         // DELETE api/<AdressController>/5
         [HttpDelete("{id}")]
         public void Delete(Guid id)
         {
+            Adress toBeDeleted = _adressesContext.Adresses.Where(a => a.Id == id).First();
+            _adressesContext.Remove(toBeDeleted);
+            _adressesContext.SaveChanges();
         }
     }
 }
