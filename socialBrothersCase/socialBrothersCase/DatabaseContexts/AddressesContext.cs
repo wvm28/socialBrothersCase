@@ -7,16 +7,16 @@ using socialBrothersCase.Models;
 
 namespace socialBrothersCase.DatabaseContexts
 {
-    public class AdressesContext : DbContext
+    public class AddressesContext : DbContext
     {
-        public DbSet<Adress> Adresses { get; set; }
-        public AdressesContext(DbContextOptions<AdressesContext> options) : base(options)
+        public DbSet<Address> Adresses { get; set; }
+        public AddressesContext(DbContextOptions<AddressesContext> options) : base(options)
         {
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Adress>(entity =>
+            modelBuilder.Entity<Address>(entity =>
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Id);
@@ -26,7 +26,7 @@ namespace socialBrothersCase.DatabaseContexts
                 entity.Property(e => e.Location).HasMaxLength(250); ;
                 entity.Property(e => e.Country).HasMaxLength(250); ;
 
-                entity.HasData(new Adress
+                entity.HasData(new Address
                 {
                     Id = Guid.NewGuid(),
                     Street = "Europalaan",

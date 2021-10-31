@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace socialBrothersCase.Models
 {
-    public class Adress
+    public class Address
     {
         public Guid Id { get; init; }
         [Required]

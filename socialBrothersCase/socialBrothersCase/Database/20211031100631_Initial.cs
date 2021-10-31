@@ -12,11 +12,11 @@ namespace socialBrothersCase.Database
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "TEXT", nullable: false),
-                    Street = table.Column<string>(type: "TEXT", maxLength: 250, nullable: true),
+                    Street = table.Column<string>(type: "TEXT", maxLength: 250, nullable: false),
                     HouseNumber = table.Column<int>(type: "INTEGER", maxLength: 250, nullable: false),
-                    PostalCode = table.Column<string>(type: "TEXT", maxLength: 250, nullable: true),
-                    Location = table.Column<string>(type: "TEXT", maxLength: 250, nullable: true),
-                    Country = table.Column<string>(type: "TEXT", maxLength: 250, nullable: true)
+                    PostalCode = table.Column<string>(type: "TEXT", maxLength: 250, nullable: false),
+                    Location = table.Column<string>(type: "TEXT", maxLength: 250, nullable: false),
+                    Country = table.Column<string>(type: "TEXT", maxLength: 250, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -26,7 +26,7 @@ namespace socialBrothersCase.Database
             migrationBuilder.InsertData(
                 table: "Adresses",
                 columns: new[] { "Id", "Country", "HouseNumber", "Location", "PostalCode", "Street" },
-                values: new object[] { new Guid("f744af43-a61f-4fe8-b4ce-d50762e8c905"), "The Netherlands", 100, "Utrecht", "3526 KS", "Europalaan" });
+                values: new object[] { new Guid("3884daa0-01e9-4cb8-9ded-08025419db4f"), "The Netherlands", 100, "Utrecht", "3526 KS", "Europalaan" });
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
