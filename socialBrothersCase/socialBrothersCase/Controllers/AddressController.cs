@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using socialBrothersCase.ApiServices;
 using socialBrothersCase.DatabaseContexts;
 using socialBrothersCase.Models;
 
@@ -17,9 +18,11 @@ namespace socialBrothersCase.Controllers
     public class AddressController : ControllerBase
     {
         private AddressesContext _addressesContext;
-        public AddressController(AddressesContext addressesContext)
+        private RadarService _radarService;
+        public AddressController(AddressesContext addressesContext, RadarService radarService)
         {
             _addressesContext = addressesContext;
+            _radarService = radarService;
         }
 
         // GET: api/<AddressController>
@@ -46,11 +49,14 @@ namespace socialBrothersCase.Controllers
         }
 
         // GET api/<AddressController>/5
+        /// <summary>
+        /// Gets an addres by ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("{id}")]
         public IActionResult Get(Guid id)
         {
-            //TODO add catch if there is no adress with given ID
-            
             if (_addressesContext.Adresses.Any(a => a.Id == id))
             {
                 return Ok(_addressesContext.Adresses.First(a => a.Id == id));
@@ -62,6 +68,11 @@ namespace socialBrothersCase.Controllers
         }
 
         // POST api/<AddressController>
+        /// <summary>
+        /// Creates a new address if given ID is unique, or if no ID is given
+        /// </summary>
+        /// <param name="newAdress"></param>
+        /// <returns></returns>
         [HttpPost]
         public IActionResult Post([FromBody] Address newAdress)
         {
@@ -76,22 +87,74 @@ namespace socialBrothersCase.Controllers
         }
 
         // PUT api/<AddressController>/5
+        /// <summary>
+        /// Updates given address to new values, if na address is found with given ID it will create one
+        /// </summary>
+        /// <param name="newValues"></param>
         [HttpPut]
         public void Put([FromBody] Address newValues)
         {
             //TODO add check thing idk anymore
-            _addressesContext.Update(newValues);
+            
+            if (_addressesContext.Adresses.Any(a => a.Id == newValues.Id))
+            {
+                _addressesContext.Update(newValues);
+            } else
+            {
+                _addressesContext.Add(newValues);
+            }
             _addressesContext.SaveChanges();
         }
 
         // DELETE api/<AddressController>/5
+        /// <summary>
+        /// Deletes the address that responds to the given id. If no address with given ID exist it returns a not found
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpDelete("{id}")]
-        public void Delete(Guid id)
+        public IActionResult Delete(Guid id)
         {
-            //TODO add check if adress exists
-            Address toBeDeleted = _addressesContext.Adresses.Where(a => a.Id == id).First();
-            _addressesContext.Remove(toBeDeleted);
-            _addressesContext.SaveChanges();
+            if (_addressesContext.Adresses.Any(a => a.Id == id))
+            {
+                Address toBeDeleted = _addressesContext.Adresses.Where(a => a.Id == id).First();
+                _addressesContext.Remove(toBeDeleted);
+                _addressesContext.SaveChanges();
+                return Ok();
+            } else
+            {
+                return NotFound();
+            }
+            
+        }
+
+        // GET: api/<AddressController>/getDistance/
+        [HttpGet]
+        [Route("getDistance")]
+        ///<summary>
+        /// Uses the given ID's to request coordinates for the responding addresses. After that it will request the distance inbetween both sets of coordinates.
+        /// All three of these requests go the Radar API
+        ///</summary>
+        ///<param name="startingId"></param>
+        ///<param name="finishId"></param>
+        public async Task<IActionResult> GetDistanceAsync([FromQuery] Guid startId, [FromQuery] Guid finishId)
+        {
+            if (_addressesContext.Adresses.Any(a => a.Id == startId) != false || _addressesContext.Adresses.Any(a => a.Id == finishId) != false)
+            {
+                var startAddress = _addressesContext.Adresses.First(a => a.Id == startId);
+                Coordinates startAddressCoords = await _radarService.GetCoordinatesAsync(startAddress);
+
+                var finishAddress = _addressesContext.Adresses.First(a => a.Id == finishId);
+                Coordinates finishAddressCoords = await _radarService.GetCoordinatesAsync(finishAddress);
+
+                var result = _radarService.GetDistance(startAddressCoords, finishAddressCoords);
+                return Ok(result);
+            }
+            else
+            {
+                return NotFound();
+            }
+            return Ok("Tada");
         }
     }
 }

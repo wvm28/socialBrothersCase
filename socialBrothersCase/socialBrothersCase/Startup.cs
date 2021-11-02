@@ -12,6 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using socialBrothersCase.ApiServices;
 using socialBrothersCase.DatabaseContexts;
 
 namespace socialBrothersCase
@@ -29,6 +30,7 @@ namespace socialBrothersCase
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<AddressesContext>(options => options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddHttpClient<RadarService>();
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
